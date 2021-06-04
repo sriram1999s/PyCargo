@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+import sys
+import os
+
+# Initializations
+option = None
+name = None
+
+# Parsing command line args
+try:
+    option = sys.argv[1]
+except:
+    print("No Options Provided: Version 1.0.0")
+
+
+if __name__ == "__main__":
+    if(option == "new"): # to create a new binary application
+        try:
+            name = sys.argv[2]
+            try:
+                os.mkdir(name)
+                print(f"    Binary application {name} package created!")
+            except OSError as error:
+                print(error)
+        except:
+            print("Please a name for the package!!")
