@@ -22,7 +22,7 @@ PyCargo new <name>
 
 ## Running
 
-make sure to be in a cargo managed directory!
+make sure to be in a PyCargo managed directory!
 
 ```shell
 PyCargo run
