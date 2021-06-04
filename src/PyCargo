@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
-
+from colorama import Fore, Style
 # Initializations
 option = None
 name = None
@@ -18,9 +18,28 @@ if __name__ == "__main__":
         try:
             name = sys.argv[2]
             try:
-                os.mkdir(name)
-                print(f"    Binary application {name} package created!")
+                os.mkdir(name) # creates dir
+                os.system(f"git init {name} > /dev/null") # inits dir as git repo
+                os.mkdir(name +'/src') # creates src subdir
+                os.system(f"touch {name}/.gitignore {name}/src/main.py {name}/PyCargo.toml") # creates gitignore creates main file
+                os.system(f'''echo 'if __name__ == "__main__":\n\tprint("Hello World")' > {name}/src/main.py''') # creating initial program
+                os.system(f'cd {name}; git add -A > /dev/null; git commit -m "Initial commit" > /dev/null') # initial commit
+                print(f"    Binary application {Fore.GREEN}{name}{Style.RESET_ALL} package created!!")
             except OSError as error:
                 print(error)
         except:
             print("Please a name for the package!!")
+
+    elif(option == "run"): # run package
+        if(os.path.exists("PyCargo.toml")):
+            try:
+                print(f"\t{Fore.GREEN}Finished{Style.RESET_ALL} Dev \n\t{Fore.GREEN}Running{Style.RESET_ALL}...\n")
+                os.system("python3 src/main.py")
+            except OSError as error:
+                print(error)
+        else:
+            print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!\n\tOr\n\tYou may have deleted the TOML file, run:\n\t\t{Fore.GREEN}PyCargo create_toml{Style.RESET_ALL}")
+
+
+    elif(option == "create_toml"):
+        print("TOML created!!")
