@@ -1,5 +1,5 @@
 # PyCargo
-## A Package Manager for python, similar to Rust's Cargo
+## A Package Manager for Python, similar to Rust's Cargo
 
 ## Functionalities
 
