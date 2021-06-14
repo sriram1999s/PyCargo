@@ -43,6 +43,28 @@ def new(name):
     except OSError as error:
         print(error)
 
+def init():
+    global version
+    global edition
+    curr_dir = os.getcwd()
+    curr_parent_path = os.path.dirname(curr_dir) + '/'
+    name = remove_prefix(curr_dir, curr_parent_path) #name of the current directory
+    user = os.environ['USER']
+
+    os.system(f"git init > /dev/null") # inits dir as git repo
+    os.mkdir('src') # creates src subdir
+    os.system(f"touch .gitignore src/main.py PyCargo.toml") # creates gitignore creates main file
+    os.system(f'''echo 'if __name__ == "__main__":\n\tprint("Hello World")' > src/main.py''') # creating initial program
+    os.system(f'git add -A > /dev/null; git commit -m "Initial commit" > /dev/null') # initial commit
+    toml = f'[package]\nname = "{name}"\nversion = "{version}"\nauthors = ["{user}"]\nedition = "{edition}"\n\n[dependancies]'
+    os.system(f'''echo '{toml}' > PyCargo.toml''') # writing to toml file
+    print(f"    Binary application {Fore.GREEN}{name}{Style.RESET_ALL} package created!!")
+    homedir = os.environ['HOME']
+    curr_path = os.path.abspath(os.getcwd())
+    with open(homedir + "/projects/PyCargo/store/directories.bin", "ab") as file:
+        code = bytearray(f"{curr_path}\n".encode("ascii"))
+        file.write(code)
+
 def run():
     if(os.path.exists("PyCargo.toml")):
          try:
@@ -77,5 +99,5 @@ def create_toml():
         print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!")
 
 if __name__ == "__main__":
-    command_dict = {'new':new, 'run':run, 'create_toml':create_toml}
+    command_dict = {'new':new, 'run':run, 'create_toml':create_toml, 'init':init}
     fire.Fire(command_dict)
