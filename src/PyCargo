@@ -5,23 +5,41 @@ import fire
 from colorama import Fore, Style
 # Initializations
 option = None
-name = None
+g_name = None
 
+version = "0.1.0"
+edition = "2021"
 # Parsing command line args
 try:
     option = sys.argv[1]
 except:
-    print("No Options Provided: Version 1.0.0")
+    print("No Options Provided")
+
+def remove_prefix(text, prefix): # removes a prefix from text if exists
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text
 
 def new(name):
+    global g_name
+    g_name = name
     try:
+        user = os.environ['USER']
         os.mkdir(name) # creates dir
         os.system(f"git init {name} > /dev/null") # inits dir as git repo
         os.mkdir(name +'/src') # creates src subdir
         os.system(f"touch {name}/.gitignore {name}/src/main.py {name}/PyCargo.toml") # creates gitignore creates main file
         os.system(f'''echo 'if __name__ == "__main__":\n\tprint("Hello World")' > {name}/src/main.py''') # creating initial program
         os.system(f'cd {name}; git add -A > /dev/null; git commit -m "Initial commit" > /dev/null') # initial commit
+        toml = f'[package]\nname = "{name}"\nversion = "{version}"\nauthors = ["{user}"]\nedition = "{edition}"\n\n[dependancies]'
+        os.system(f'''echo '{toml}' > {name}/PyCargo.toml''') # writing to toml file
         print(f"    Binary application {Fore.GREEN}{name}{Style.RESET_ALL} package created!!")
+        homedir = os.environ['HOME']
+        curr_path = os.path.abspath(os.getcwd())
+        with open(homedir + "/projects/PyCargo/store/directories.bin", "ab") as file:
+            code = bytearray(f"{curr_path}/{name}\n".encode("ascii"))
+            file.write(code)
+
     except OSError as error:
         print(error)
 
@@ -36,7 +54,27 @@ def run():
          print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!\n\tOr\n\tYou may have deleted the TOML file, run:\n\t\t{Fore.GREEN}PyCargo create_toml{Style.RESET_ALL}")
 
 def create_toml():
-    print("TOML created!!")
+    global version
+    global edition
+    PRESENT = False
+    curr_dir = os.getcwd()
+    curr_parent_path = os.path.dirname(curr_dir) + '/'
+    dir_name = remove_prefix(curr_dir, curr_parent_path) #name of the current directory
+    curr_dir = curr_dir + '\n'
+    homedir = os.environ['HOME']
+    user = os.environ['USER']
+    ''' checking if in PyCargo managed dir '''
+    with open(homedir + "/projects/PyCargo/store/directories.bin", "r") as file:
+        for dir in file:
+            if(curr_dir == dir):
+                PRESENT = True
+                break
+    if(PRESENT):
+        os.system(f"touch PyCargo.toml") # creates toml file
+        toml = f'[package]\nname = "{dir_name}"\nversion = "{version}"\nauthors = ["{user}"]\nedition = "{edition}"\n\n[dependancies]'
+        os.system(f'''echo '{toml}' > PyCargo.toml''')
+    else:
+        print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!")
 
 if __name__ == "__main__":
     command_dict = {'new':new, 'run':run, 'create_toml':create_toml}
