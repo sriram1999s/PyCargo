@@ -5,7 +5,7 @@
 
   - [help](#Help)
   - [new](#Creating-Package)
-  - [init](#Initializing directory)
+  - [init](#Initializing-directory)
   - [run](#Running)
   - [update](#Updation)
   - [create_toml](#TOML-creation)
