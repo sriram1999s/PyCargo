@@ -3,6 +3,9 @@ import sys
 import os
 import fire
 from colorama import Fore, Style
+import toml
+from helpers.str_processing import *
+from helpers.os_processing import *
 # Initializations
 option = None
 g_name = None
@@ -14,11 +17,6 @@ try:
     option = sys.argv[1]
 except:
     print("No Options Provided")
-
-def remove_prefix(text, prefix): # removes a prefix from text if exists
-    if text.startswith(prefix):
-        return text[len(prefix):]
-    return text
 
 def new(name):
     global g_name
@@ -68,6 +66,12 @@ def init():
 def run():
     if(os.path.exists("PyCargo.toml")):
          try:
+             if(not os.path.exists("PyCargo.lock")):
+                 app_data = toml.load("PyCargo.toml")
+                 dependacy_data = app_data['dependancies']
+                 prep_packages(dependacy_data)
+                 os.system("touch PyCargo.lock")
+                 
              print(f"\t{Fore.GREEN}Finished{Style.RESET_ALL} Dev \n\t{Fore.GREEN}Running{Style.RESET_ALL}...\n")
              os.system("python3 src/main.py")
          except OSError as error:
