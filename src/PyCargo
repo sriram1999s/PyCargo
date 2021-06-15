@@ -18,6 +18,28 @@ try:
 except:
     print("No Options Provided")
 
+help_dictionary = {
+    'help': 'Woah!! I see what you did there :D',
+    'new': 'Creates a new binary application in current working directory\n\t Also creates the following:\n\t\t PyCargo.toml : a file to specify package details and dependencies',
+    'init': 'Initializes the current working directory as a PyCargo managed directory',
+    'run': 'Automatically installs necessary packages specified in PyCargo.toml, runs the application',
+    'update': 'Explicitly update/install dependancies',
+    'create_toml' : 'Creates new toml file'
+    }
+
+def help(command = None):
+    print("PyCargo, a package manager for python binary applications!\n")
+    if(command!=None):
+        if(command in help_dictionary):
+            print(f"\t {command} - {help_dictionary[command]}")
+        else:
+            print("Invalid command!")
+    else:
+        for cmd in help_dictionary:
+            if(cmd != 'help'):
+                print(f"\t {cmd} - {help_dictionary[cmd]}")
+        print("\nFor specifics, use:\nPyCargo help <name-of-command>\n")
+
 def new(name):
     global g_name
     g_name = name
@@ -71,11 +93,23 @@ def run():
                  dependacy_data = app_data['dependancies']
                  prep_packages(dependacy_data)
                  os.system("touch PyCargo.lock")
-                 
+
              print(f"\t{Fore.GREEN}Finished{Style.RESET_ALL} Dev \n\t{Fore.GREEN}Running{Style.RESET_ALL}...\n")
              os.system("python3 src/main.py")
          except OSError as error:
              print(error)
+    else:
+         print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!\n\tOr\n\tYou may have deleted the TOML file, run:\n\t\t{Fore.GREEN}PyCargo create_toml{Style.RESET_ALL}")
+
+def update():
+    if(os.path.exists("PyCargo.toml")):
+        try:
+            app_data = toml.load("PyCargo.toml")
+            dependacy_data = app_data['dependancies']
+            prep_packages(dependacy_data)
+            print("Packages are updated!")
+        except OSError as error:
+            print(error)
     else:
          print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!\n\tOr\n\tYou may have deleted the TOML file, run:\n\t\t{Fore.GREEN}PyCargo create_toml{Style.RESET_ALL}")
 
@@ -103,5 +137,5 @@ def create_toml():
         print(f"\tYou are not in a {Fore.GREEN}PyCargo{Style.RESET_ALL} managed directory!!")
 
 if __name__ == "__main__":
-    command_dict = {'new':new, 'run':run, 'create_toml':create_toml, 'init':init}
+    command_dict = {'help':help, 'new':new, 'run':run, 'create_toml':create_toml, 'init':init, 'update':update}
     fire.Fire(command_dict)
